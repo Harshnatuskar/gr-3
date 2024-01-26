@@ -1,4 +1,3 @@
-import './App.css'
 import { TaskApp } from './components/Task'
 
 function App() { 
