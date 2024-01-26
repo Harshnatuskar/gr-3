@@ -17,13 +17,13 @@ export const TaskApp: React.FC = () => {
     }, []);
 
     const fetchTasks = async () => {
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
-        setTasks(data);
-    } catch (error) {
-        console.error("Error fetching tasks:", error);
-    }
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            setTasks(data);
+        } catch (error) {
+            console.error("Error fetching tasks:", error);
+        }
     };
 
     const handleAddTask = async () => {
@@ -34,15 +34,15 @@ export const TaskApp: React.FC = () => {
                 headers: {
                     "Content-type": "application/json; charset=UTF-8",
                 },
-            body: JSON.stringify(newTask),
-        };    
-        const response = await fetch(url, options);
-        const data = await response.json();
-        setTasks((prevTasks) => [...prevTasks, data]);
-        setTask("");
-    } catch (error) {
-        console.error("Error adding task:", error);
-    }
+                body: JSON.stringify(newTask),
+            };
+            const response = await fetch(url, options);
+            const data = await response.json();
+            setTasks((prevTasks) => [...prevTasks, data]);
+            setTask("");
+        } catch (error) {
+            console.error("Error adding task:", error);
+        }
     };
 
     const handleDeleteTask = async (id: number) => {
@@ -58,23 +58,29 @@ export const TaskApp: React.FC = () => {
         try {
             const taskToToggle = tasks.find((task) => task.id === id);
 
-        if (taskToToggle) {
-            const updatedTask = { ...taskToToggle, completed: !taskToToggle.completed };
-            const options = {
-            method: "PUT",
-            headers: {
-            "Content-type": "application/json; charset=UTF-8",
-            },
-            body: JSON.stringify(updatedTask),
-        };
-        const response = await fetch(`${url}/${id}`, options);
-        const data = await response.json();
-        const updatedTasks = tasks.map((task) => (task.id === id ? data : task));
-        setTasks(updatedTasks);
+            if (taskToToggle) {
+                const updatedTask = { ...taskToToggle, completed: !taskToToggle.completed };
+                const options = {
+                    method: "PUT",
+                    headers: {
+                        "Content-type": "application/json; charset=UTF-8",
+                    },
+                    body: JSON.stringify(updatedTask),
+                };
+
+                const response = await fetch(`${url}/${id}`, options);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const updatedTasks = tasks.map((task) => (task.id === id ? data : task));
+                    setTasks(updatedTasks);
+                } else {
+                    console.error("Error updating task:", response.statusText);
+                }
+            }
+        } catch (error) {
+            console.error("Error toggling task completion:", error);
         }
-    } catch (error) {
-        console.error("Error toggling task completion:", error);
-    }
     };
 
     return (
@@ -82,31 +88,31 @@ export const TaskApp: React.FC = () => {
             <form onSubmit={(e) => e.preventDefault()}>
                 <input
                     type="text"
-                value={task}
-                onChange={(e) => setTask(e.target.value)}
+                    value={task}
+                    onChange={(e) => setTask(e.target.value)}
                 />
                 <button onClick={() => handleAddTask()}>Add</button>
             </form>
 
-            <table> 
-            <tbody>
-                {tasks.map((task) => (
-                <tr key={task.id}>
-                <td
-                style={{
-                    textDecoration: task.completed ? "line-through" : "none",
-                }}
-                onClick={() => handleToggleCompleted(task.id)}
-                >
-                {task.task}
-                </td>
-                <td>
-                    <button onClick={() => handleDeleteTask(task.id)}>Delete</button>
-                </td>
-                </tr>
-            ))}
+            <table>
+                <tbody>
+                    {tasks.map((task) => (
+                        <tr key={task.id}>
+                            <td
+                                style={{
+                                    textDecoration: task.completed ? "line-through" : "none",
+                                }}
+                                onClick={() => handleToggleCompleted(task.id)}
+                            >
+                                {task.task}
+                            </td>
+                            <td>
+                                <button onClick={() => handleDeleteTask(task.id)}>Delete</button>
+                            </td>
+                        </tr>
+                    ))}
                 </tbody>
             </table>
         </div>
-);
+    );
 };
