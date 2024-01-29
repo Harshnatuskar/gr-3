@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-const url = "https://gr-3.vercel.app/tasks";
+const url = "http://localhost:3000/tasks";
 
 interface Task {
     id: number;
